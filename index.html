@@ -2,65 +2,71 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>غرف صوتية لايف</title>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#7c5cff">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>YoHoo Star - غرف صوتية</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0f0f14;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
-h1{margin:15px 0}.card{background:#1e1e2a;padding:20px;border-radius:16px;width:100%;max-width:500px;border:1px solid #2a2a3a}
-input{width:100%;padding:12px;border-radius:10px;border:none;margin:8px 0;background:#2a2a3a;color:#fff;font-size:16px}
-button{width:100%;padding:12px;border-radius:10px;border:none;background:#7c5cff;color:#fff;font-size:16px;cursor:pointer;margin-top:10px;font-weight:bold}
-#stage{display:none;width:100%;max-width:500px}.peers{display:grid;gap:10px;margin-top:20px}
-.peer{background:#1e1e2a;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a3a}
-.peer.me{border-color:#7c5cff}.controls{display:flex;gap:10px;margin-top:15px}.controls button{flex:1}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:#0a1931;color:#fff;overflow:hidden}
+.top{background:linear-gradient(#0e2450,#0a1931);padding:10px;border-bottom:2px solid #d4af37}
+.top-bar{display:flex;justify-content:space-between;align-items:center;background:#122a5a;border:1.5px solid #d4af37;border-radius:30px;padding:10px 15px}
+.rooms{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.room-card{background:linear-gradient(135deg,#f9e68c,#d4af37);color:#000;border-radius:15px;padding:12px;min-height:110px}
+.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:15px}
+.seat{text-align:center}
+.avatar{width:65px;height:65px;border-radius:50%;border:3px solid #d4af37;background:#1a335f;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto;position:relative}
+.avatar.live{border-color:#00ff88;box-shadow:0 0 15px #00ff88}
+.mic-icon{position:absolute;bottom:-8px;right:50%;transform:translateX(50%);width:28px;height:28px;background:linear-gradient(#f9e68c,#d4af37);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #0a1931}
+.gift-banner{margin:10px;background:linear-gradient(90deg,#1a335f,#0e2450);border:2px solid #d4af37;border-radius:15px;padding:12px;display:flex;align-items:center;justify-content:space-between;animation:glow 1.5s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 10px #d4af37}50%{box-shadow:0 0 25px #d4af37}}
+.bottom{position:fixed;bottom:70px;left:10px;right:10px;background:#122a5a;border:1.5px solid #d4af37;border-radius:30px;display:flex;justify-content:space-around;padding:12px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#0e2450;border-top:1px solid #d4af37;display:flex;justify-content:space-around;padding:10px}
+.btn{width:50px;height:50px;border-radius:50%;border:2px solid #d4af37;background:transparent;color:#d4af37;font-size:22px}
 </style>
 </head>
 <body>
-<h1>🎙️ غرف صوتية لايف</h1>
-<div id="joinCard" class="card">
-<input id="userName" placeholder="اسمك">
-<input id="roomId" placeholder="اسم الغرفة" value="العامة">
-<button id="joinBtn">دخول الغرفة 🎤</button>
-<p style="font-size:12px;opacity:.6;margin-top:10px">ادخل نفس اسم الغرفة انت وصحابك عشان تسمعوا بعض</p>
+<div class="top">
+ <div class="top-bar">
+  <span>←</span><b style="color:#d4af37">غرفة الدردشة الصوتية</b><span>🔍 ⋯</span>
+ </div>
 </div>
-<div id="stage">
-<div class="card">
-<h3 id="roomTitle"></h3>
-<p id="status" style="opacity:.7;font-size:14px">جاري...</p>
-<div class="controls">
-<button id="muteBtn">🔇 كتم</button>
-<button id="leaveBtn" style="background:#ff4757">خروج</button>
+
+<div style="padding:10px;color:#d4af37;display:flex;justify-content:space-between"><b>الغرف المميزة</b><span>عرض الكل ‹</span></div>
+<div class="rooms">
+ <div class="room-card"><small>🔴 مباشر • 128 مستمع</small><br><b>سهرة عربية • نقاشات مفتوحة</b><br><small>أهلا وسهلا! دردشة ومسابقات</small></div>
+ <div class="room-card"><small>🔴 مباشر • 92 مستمع</small><br><b>أغاني وطرب • جلسة طربية</b><br><small>أفضل الأغاني العربية الآن</small></div>
 </div>
+
+<div class="seats" id="seats"></div>
+
+<div class="gift-banner" id="giftBanner" style="display:none">
+ <span>🦁 هدية الأسد الذهبي</span><b style="font-size:28px">x750</b><span>🪙 عملة +500</span>
 </div>
-<div class="peers" id="peersList"></div>
+
+<div class="bottom">
+ <button class="btn" onclick="toggleMic()">🎙️</button>
+ <button class="btn" onclick="sendGift()">🎁</button>
+ <button class="btn">💬</button>
+ <button class="btn">☰</button>
 </div>
-<script type="module">
-import {joinRoom} from 'https://esm.run/trystero@0.21.0/torrent'
-let room,localStream,peers={},isMuted=false
-async function initMic(){try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});return true}catch(e){alert('لازم تسمح للمايك');return false}}
-function addPeerUI(id,name,isMe=false){if(document.getElementById('peer-'+id))return;const d=document.createElement('div');d.id='peer-'+id;d.className='peer'+(isMe?' me':'');d.innerHTML=`<span>${name} ${isMe?'(انت)':''}</span><span>🎤</span>`;document.getElementById('peersList').appendChild(d)}
-document.getElementById('joinBtn').onclick=async()=>{
-const name=document.getElementById('userName').value.trim()||'مجهول'
-const roomName=document.getElementById('roomId').value.trim()||'العامة'
-if(!(await initMic()))return
-document.getElementById('joinBtn').disabled=true
-document.getElementById('joinCard').style.display='none'
-document.getElementById('stage').style.display='block'
-document.getElementById('roomTitle').textContent='غرفة: '+roomName
-document.getElementById('status').textContent='متصل! ابعت اسم الغرفة لصحابك'
-room=joinRoom({appId:'rakaan-voice-final-2026'},roomName)
-const [sendStream,getStream]=room.makeAction('stream')
-const [sendName,getName]=room.makeAction('name')
-room.onPeerJoin(id=>{addPeerUI(id,'صديق');if(localStream)sendStream(localStream,id);sendName(name,id)})
-room.onPeerLeave(id=>{const el=document.getElementById('peer-'+id);if(el)el.remove();if(peers[id]){peers[id].pause();delete peers[id]}})
-getName((n,id)=>{const el=document.getElementById('peer-'+id);if(el)el.firstChild.textContent=n})
-getStream((s,id)=>{let a=peers[id];if(!a){a=document.createElement('audio');a.autoplay=true;peers[id]=a;document.body.appendChild(a)}a.srcObject=s;addPeerUI(id,'صديق')})
-addPeerUI(room.getId?room.getId():Math.random(),name,true)
-sendName(name);if(localStream)sendStream(localStream)
+<div class="nav"><span>🏠 الرئيسية</span><span>👥 الغرف</span><span>👤 أنا</span></div>
+
+<script>
+const names=["سارة","أحمد","نور","خالد","مقعد فارغ","ريم","يوسف","لينا","عمر","لمى","فيصل","مقعد فارغ"];
+const seats=document.getElementById('seats');
+names.forEach((n,i)=>{
+ seats.innerHTML+=`<div class="seat"><div class="avatar ${i<4?'live':''}">${n.includes('فارغ')?'+': '👤'}<div class="mic-icon">🎙️</div></div><small>${n}</small></div>`;
+});
+function sendGift(){
+ const b=document.getElementById('giftBanner');
+ b.style.display='flex';
+ setTimeout(()=>b.style.display='none',4000);
 }
-document.getElementById('muteBtn').onclick=()=>{if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);document.getElementById('muteBtn').textContent=isMuted?'🎤 فتح':'🔇 كتم'}
-document.getElementById('leaveBtn').onclick=()=>location.reload()
+let micOn=false;
+function toggleMic(){
+ micOn=!micOn;
+ alert(micOn?'المايك شغال 🎙️':'المايك مقفل 🔇');
+ navigator.mediaDevices.getUserMedia({audio:true}).then(s=>console.log('mic ok'));
+}
 </script>
 </body>
 </html>
