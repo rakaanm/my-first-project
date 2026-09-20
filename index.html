@@ -1,2 +1,64 @@
 <!DOCTYPE html>
-<html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>غرف صوتية</title><style>body{font-family:sans-serif;background:#111;color:#fff;text-align:center;padding:20px}.room{background:#222;padding:20px;border-radius:12px;width:200px;cursor:pointer;display:inline-block;margin:10px;border:1px solid #333}button{padding:10px 20px;background:#6c5ce7;color:#fff;border:none;border-radius:8px}input{padding:10px;border-radius:8px;border:none;width:200px}#controls{display:none;margin-top:20px}.user{margin:5px;background:#2d3436;padding:8px;border-radius:6px}</style></head><body><h1>🎤 غرف الدردشة</h1><input id="roomName" placeholder="اسم الغرفة"><button onclick="joinExisting(document.getElementById('roomName').value)">دخول</button><div id="controls"><h2 id="currentRoom"></h2><button id="muteBtn" onclick="toggleMute()">كتم</button><button onclick="leaveRoom()" style="background:#d63031">خروج</button><div id="users"></div></div><div style="margin-top:30px"><div class="room" onclick="joinExisting('العامة')">🔊 العامة</div><div class="room" onclick="joinExisting('سوالف')">💬 سوالف</div><div class="room" onclick="joinExisting('العاب')">🎮 العاب</div></div><script>let localStream,isMuted=false;async function joinExisting(name){if(!name)return alert('اكتب اسم الغرفة');document.getElementById('currentRoom').innerText='غرفة: '+name;document.getElementById('controls').style.display='block';try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});let d=document.createElement('div');d.className='user';d.innerText='🎤 انت';document.getElementById('users').appendChild(d);}catch(e){alert('اسمح للمايك');}}function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks()[0].enabled=!isMuted;document.getElementById('muteBtn').innerText=isMuted?'فتح المايك':'كتم';}function leaveRoom(){document.getElementById('controls').style.display='none';document.getElementById('users').innerHTML='';if(localStream)localStream.getTracks().forEach(t=>t.stop());}</script></body></html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>غرف صوتية لايف</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0f0f14;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{margin:15px 0}.card{background:#1e1e2a;padding:20px;border-radius:16px;width:100%;max-width:500px;border:1px solid #2a2a3a}
+input{width:100%;padding:12px;border-radius:10px;border:none;margin:8px 0;background:#2a2a3a;color:#fff;font-size:16px}
+button{width:100%;padding:12px;border-radius:10px;border:none;background:#7c5cff;color:#fff;font-size:16px;cursor:pointer;margin-top:10px;font-weight:bold}
+#stage{display:none;width:100%;max-width:500px}.peers{display:grid;gap:10px;margin-top:20px}
+.peer{background:#1e1e2a;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a3a}
+.peer.me{border-color:#7c5cff}.controls{display:flex;gap:10px;margin-top:15px}.controls button{flex:1}
+</style>
+</head>
+<body>
+<h1>🎙️ غرف صوتية لايف</h1>
+<div id="joinCard" class="card">
+<input id="userName" placeholder="اسمك">
+<input id="roomId" placeholder="اسم الغرفة" value="العامة">
+<button id="joinBtn">دخول الغرفة 🎤</button>
+<p style="font-size:12px;opacity:.6;margin-top:10px">ادخل نفس اسم الغرفة انت وصحابك عشان تسمعوا بعض</p>
+</div>
+<div id="stage">
+<div class="card">
+<h3 id="roomTitle"></h3>
+<p id="status" style="opacity:.7;font-size:14px">جاري...</p>
+<div class="controls">
+<button id="muteBtn">🔇 كتم</button>
+<button id="leaveBtn" style="background:#ff4757">خروج</button>
+</div>
+</div>
+<div class="peers" id="peersList"></div>
+</div>
+<script type="module">
+import {joinRoom} from 'https://esm.run/trystero@0.21.0/torrent'
+let room,localStream,peers={},isMuted=false
+async function initMic(){try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});return true}catch(e){alert('لازم تسمح للمايك');return false}}
+function addPeerUI(id,name,isMe=false){if(document.getElementById('peer-'+id))return;const d=document.createElement('div');d.id='peer-'+id;d.className='peer'+(isMe?' me':'');d.innerHTML=`<span>${name} ${isMe?'(انت)':''}</span><span>🎤</span>`;document.getElementById('peersList').appendChild(d)}
+document.getElementById('joinBtn').onclick=async()=>{
+const name=document.getElementById('userName').value.trim()||'مجهول'
+const roomName=document.getElementById('roomId').value.trim()||'العامة'
+if(!(await initMic()))return
+document.getElementById('joinBtn').disabled=true
+document.getElementById('joinCard').style.display='none'
+document.getElementById('stage').style.display='block'
+document.getElementById('roomTitle').textContent='غرفة: '+roomName
+document.getElementById('status').textContent='متصل! ابعت اسم الغرفة لصحابك'
+room=joinRoom({appId:'rakaan-voice-final-2026'},roomName)
+const [sendStream,getStream]=room.makeAction('stream')
+const [sendName,getName]=room.makeAction('name')
+room.onPeerJoin(id=>{addPeerUI(id,'صديق');if(localStream)sendStream(localStream,id);sendName(name,id)})
+room.onPeerLeave(id=>{const el=document.getElementById('peer-'+id);if(el)el.remove();if(peers[id]){peers[id].pause();delete peers[id]}})
+getName((n,id)=>{const el=document.getElementById('peer-'+id);if(el)el.firstChild.textContent=n})
+getStream((s,id)=>{let a=peers[id];if(!a){a=document.createElement('audio');a.autoplay=true;peers[id]=a;document.body.appendChild(a)}a.srcObject=s;addPeerUI(id,'صديق')})
+addPeerUI(room.getId?room.getId():Math.random(),name,true)
+sendName(name);if(localStream)sendStream(localStream)
+}
+document.getElementById('muteBtn').onclick=()=>{if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);document.getElementById('muteBtn').textContent=isMuted?'🎤 فتح':'🔇 كتم'}
+document.getElementById('leaveBtn').onclick=()=>location.reload()
+</script>
+</body>
+</html>
