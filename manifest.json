@@ -1,0 +1,16 @@
+{
+  "name": "غرف صوتية لايف",
+  "short_name": "غرف لايف",
+  "description": "غرف صوتية جماعية بدون سيرفر",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f0f14",
+  "theme_color": "#7c5cff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/138/138817.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
